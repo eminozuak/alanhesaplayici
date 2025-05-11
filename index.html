@@ -6,10 +6,11 @@
   <title>Drone Dizilim</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
+      font-family: 'Arial', sans-serif;
+      background: #f8f8f8;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      color: #333;
     }
     .container {
       max-width: 1000px;
@@ -17,67 +18,119 @@
       background: white;
       padding: 20px;
       border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     }
-    input, button {
-      padding: 10px;
-      font-size: 16px;
-      margin-top: 10px;
+    h2 {
+      text-align: center;
+      font-size: 24px;
+      color: #388E3C;
+    }
+    input, button, span {
       width: 100%;
+      font-size: 16px;
+      padding: 12px;
+      margin: 8px 0;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      background: #f1f1f1;
+    }
+    input:focus, button:focus {
+      border-color: #4CAF50;
+      outline: none;
     }
     #gridContainer {
-      margin-top: 30px;
+      margin-top: 20px;
       overflow: auto;
-      padding: 20px;
-      background: #e0e0e0;
+      padding: 10px;
+      background: #e9e9e9;
       border-radius: 12px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     }
     .grid {
       display: grid;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
+      margin: 0 auto;
     }
     .drone {
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      color: white;
+      width: 30px;
+      height: 30px;
       background: linear-gradient(145deg, #4CAF50, #388E3C);
-      border-radius: 4px;
-      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-      transition: transform 0.2s;
+      border-radius: 10px;
+      box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      font-size: 10px;
+      transition: transform 0.2s ease, background 0.3s ease;
     }
     .drone:hover {
       transform: scale(1.2);
+      background: linear-gradient(145deg, #388E3C, #4CAF50);
     }
     #sonuc {
       margin-top: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-    @media (max-width: 600px) {
+    .slider-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .slider-container span {
+      font-size: 14px;
+      margin-right: 10px;
+    }
+    .slider-container input {
+      width: 70%;
+    }
+
+    @media (max-width: 768px) {
       .drone {
-        width: 14px;
-        height: 14px;
+        width: 24px;
+        height: 24px;
         font-size: 8px;
+      }
+      .slider-container input {
+        width: 60%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .drone {
+        width: 20px;
+        height: 20px;
+        font-size: 7px;
+      }
+      .slider-container input {
+        width: 50%;
       }
     }
   </style>
 </head>
 <body>
+
   <div class="container">
     <h2>Drone Dizilim Görselleştirici</h2>
     <p>Drone sayısını girin (100 - 5000):</p>
     <input type="number" id="droneSayisi" min="100" max="5000" />
 
-    <p>Satır sayısını ayarlayın:</p>
-    <input type="range" id="satirSlider" min="1" max="100" value="10" />
-    <span id="satirValue">10</span>
+    <div class="slider-container">
+      <span>Satır:</span>
+      <input type="range" id="satirSlider" min="1" max="100" value="10" />
+      <span id="satirValue">10</span>
+    </div>
 
-    <p>Sütun sayısını ayarlayın:</p>
-    <input type="range" id="sutunSlider" min="1" max="100" value="10" />
-    <span id="sutunValue">10</span>
+    <div class="slider-container">
+      <span>Sütun:</span>
+      <input type="range" id="sutunSlider" min="1" max="100" value="10" />
+      <span id="sutunValue">10</span>
+    </div>
 
     <div id="sonuc"></div>
     <div id="gridContainer">
@@ -86,20 +139,18 @@
   </div>
 
   <script>
-    function updateSatirValue() {
-      document.getElementById("satirValue").textContent = document.getElementById("satirSlider").value;
-      hesapla();
-    }
-
-    function updateSutunValue() {
-      document.getElementById("sutunValue").textContent = document.getElementById("sutunSlider").value;
-      hesapla();
-    }
-
-    document.getElementById("satirSlider").addEventListener("input", updateSatirValue);
-    document.getElementById("sutunSlider").addEventListener("input", updateSutunValue);
+    // Slider güncellemeleri
+    document.getElementById("satirSlider").addEventListener("input", function() {
+      document.getElementById("satirValue").textContent = this.value;
+      hesapla();  // Slider kaydırıldıkça dizilimi günceller
+    });
+    document.getElementById("sutunSlider").addEventListener("input", function() {
+      document.getElementById("sutunValue").textContent = this.value;
+      hesapla();  // Slider kaydırıldıkça dizilimi günceller
+    });
     document.getElementById("droneSayisi").addEventListener("input", hesapla);
 
+    // Hesaplama fonksiyonu
     function hesapla() {
       const droneSayisi = parseInt(document.getElementById("droneSayisi").value);
       const satirSayisi = parseInt(document.getElementById("satirSlider").value);
@@ -116,8 +167,8 @@
       grid.style.gridTemplateColumns = `repeat(${sutunSayisi}, auto)`;
 
       let sayac = 0;
-      for (let c = 0; c < sutunSayisi; c++) {
-        for (let r = 0; r < satirSayisi; r++) {
+      for (let r = 0; r < satirSayisi; r++) {
+        for (let c = 0; c < sutunSayisi; c++) {
           if (sayac >= droneSayisi) break;
           const drone = document.createElement("div");
           drone.className = "drone";
@@ -125,6 +176,7 @@
           grid.appendChild(drone);
           sayac++;
         }
+        if (sayac >= droneSayisi) break;
       }
 
       const genislik = (sutunSayisi - 1) * 0.5;
@@ -142,9 +194,9 @@
       `;
     }
 
-    // Başlangıçta dizilimi hesapla
+    // İlk yüklemede dizilimi hesapla
     hesapla();
   </script>
+
 </body>
 </html>
-	
