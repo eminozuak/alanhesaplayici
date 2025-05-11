@@ -136,6 +136,9 @@
     <div id="gridContainer">
       <div id="grid" class="grid"></div>
     </div>
+    <div>
+      <b>Show ID: </b><span id="showID">-</span>
+    </div>
   </div>
 
   <script>
@@ -173,6 +176,7 @@
           const drone = document.createElement("div");
           drone.className = "drone";
           drone.textContent = sayac;
+          drone.setAttribute("data-id", sayac);  // ID ekliyoruz
           grid.appendChild(drone);
           sayac++;
         }
@@ -193,6 +197,21 @@
         Toplam Alan: ${alan.toFixed(2)} m²
       `;
     }
+
+    // Drone kutusunun üzerine gelindiğinde kırmızıya dönme, çıkınca orijinal rengini alması
+    document.getElementById("grid").addEventListener("mouseover", function(event) {
+      if (event.target && event.target.classList.contains("drone")) {
+        event.target.style.background = "red";  // Kırmızıya döndür
+        const droneID = event.target.getAttribute("data-id");
+        document.getElementById("showID").textContent = droneID;
+      }
+    });
+
+    document.getElementById("grid").addEventListener("mouseout", function(event) {
+      if (event.target && event.target.classList.contains("drone")) {
+        event.target.style.background = "";  // Orijinal rengine döndür
+      }
+    });
 
     // İlk yüklemede dizilimi hesapla
     hesapla();
