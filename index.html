@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drone Dizilim</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 10px;
+      width: 100%;
+    }
+    #gridContainer {
+      margin-top: 30px;
+      overflow: auto;
+      padding: 20px;
+      background: #e0e0e0;
+      border-radius: 12px;
+    }
+    .grid {
+      display: grid;
+      justify-content: center;
+      gap: 8px;
+    }
+    .drone {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: white;
+      background: linear-gradient(145deg, #4CAF50, #388E3C);
+      border-radius: 4px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+    .drone:hover {
+      transform: scale(1.2);
+    }
+    #sonuc {
+      margin-top: 20px;
+    }
+    @media (max-width: 600px) {
+      .drone {
+        width: 14px;
+        height: 14px;
+        font-size: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Drone Dizilim Görselleştirici</h2>
+    <p>Drone sayısını girin (100 - 5000):</p>
+    <input type="number" id="droneSayisi" min="100" max="5000" />
+
+    <p>Satır sayısını ayarlayın:</p>
+    <input type="range" id="satirSlider" min="1" max="100" value="10" />
+    <span id="satirValue">10</span>
+
+    <p>Sütun sayısını ayarlayın:</p>
+    <input type="range" id="sutunSlider" min="1" max="100" value="10" />
+    <span id="sutunValue">10</span>
+
+    <div id="sonuc"></div>
+    <div id="gridContainer">
+      <div id="grid" class="grid"></div>
+    </div>
+  </div>
+
+  <script>
+    function updateSatirValue() {
+      document.getElementById("satirValue").textContent = document.getElementById("satirSlider").value;
+      hesapla();
+    }
+
+    function updateSutunValue() {
+      document.getElementById("sutunValue").textContent = document.getElementById("sutunSlider").value;
+      hesapla();
+    }
+
+    document.getElementById("satirSlider").addEventListener("input", updateSatirValue);
+    document.getElementById("sutunSlider").addEventListener("input", updateSutunValue);
+    document.getElementById("droneSayisi").addEventListener("input", hesapla);
+
+    function hesapla() {
+      const droneSayisi = parseInt(document.getElementById("droneSayisi").value);
+      const satirSayisi = parseInt(document.getElementById("satirSlider").value);
+      const sutunSayisi = parseInt(document.getElementById("sutunSlider").value);
+      const sonucDiv = document.getElementById("sonuc");
+      const grid = document.getElementById("grid");
+      grid.innerHTML = "";
+
+      if (isNaN(droneSayisi) || droneSayisi < 100 || droneSayisi > 5000) {
+        sonucDiv.innerHTML = "<b>Lütfen 100 ile 5000 arasında bir sayı girin.</b>";
+        return;
+      }
+
+      grid.style.gridTemplateColumns = `repeat(${sutunSayisi}, auto)`;
+
+      let sayac = 0;
+      for (let c = 0; c < sutunSayisi; c++) {
+        for (let r = 0; r < satirSayisi; r++) {
+          if (sayac >= droneSayisi) break;
+          const drone = document.createElement("div");
+          drone.className = "drone";
+          drone.textContent = sayac;
+          grid.appendChild(drone);
+          sayac++;
+        }
+      }
+
+      const genislik = (sutunSayisi - 1) * 0.5;
+      const yukseklik = (satirSayisi - 1) * 0.5;
+      const alan = genislik * yukseklik;
+
+      sonucDiv.innerHTML = `
+        <b>Sonuç:</b><br>
+        Drone Sayısı: ${droneSayisi}<br>
+        Satır: ${satirSayisi}<br>
+        Sütun: ${sutunSayisi}<br>
+        Genişlik: ${genislik.toFixed(2)} m<br>
+        Yükseklik: ${yukseklik.toFixed(2)} m<br>
+        Toplam Alan: ${alan.toFixed(2)} m²
+      `;
+    }
+
+    // Başlangıçta dizilimi hesapla
+    hesapla();
+  </script>
+</body>
+</html>
+	
